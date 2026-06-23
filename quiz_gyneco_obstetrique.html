@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Gynéco-Obstétrique · INFAS 1ère Année</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+  :root {
+    --rose: #C2185B;
+    --rose-light: #F8BBD9;
+    --rose-pale: #FCE4EC;
+    --indigo: #283593;
+    --indigo-mid: #3F51B5;
+    --teal: #00838F;
+    --green: #2E7D32;
+    --green-bg: #E8F5E9;
+    --red: #C62828;
+    --red-bg: #FFEBEE;
+    --gold: #F9A825;
+    --bg: #FDF6F9;
+    --card: #FFFFFF;
+    --text: #1A1A2E;
+    --muted: #6B7280;
+    --border: #F0DCE8;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--rose) 100%);
+    color: white;
+    padding: 2rem 1.5rem 3rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 200px; height: 200px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.06);
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -30px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: rgba(255,255,255,.04);
+  }
+  .header-badge {
+    display: inline-block;
+    background: rgba(255,255,255,.2);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 50px;
+    padding: .3rem 1rem;
+    font-size: .75rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 5vw, 2.4rem);
+    line-height: 1.2;
+    margin-bottom: .5rem;
+  }
+  header p {
+    font-size: .9rem;
+    opacity: .85;
+    max-width: 480px;
+    margin: 0 auto;
+  }
+
+  /* ── PROGRESS ── */
+  .progress-wrap {
+    background: white;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .progress-label {
+    font-size: .8rem;
+    font-weight: 600;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+  .progress-bar-outer {
+    flex: 1;
+    background: var(--rose-pale);
+    border-radius: 99px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-bar-inner {
+    height: 100%;
+    background: linear-gradient(90deg, var(--indigo-mid), var(--rose));
+    border-radius: 99px;
+    transition: width .4s ease;
+  }
+  .score-chip {
+    background: var(--indigo);
+    color: white;
+    border-radius: 99px;
+    padding: .25rem .75rem;
+    font-size: .78rem;
+    font-weight: 700;
+  }
+
+  /* ── MAIN ── */
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 1.5rem 1rem 4rem;
+  }
+
+  /* ── SCREENS ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+
+  /* ── START SCREEN ── */
+  #screen-start {
+    text-align: center;
+    padding: 2rem 0;
+  }
+  .module-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: .75rem;
+    margin: 2rem 0;
+    text-align: left;
+  }
+  .module-chip {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: .75rem 1rem;
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.3;
+  }
+  .module-chip span {
+    display: block;
+    font-size: .7rem;
+    font-weight: 400;
+    color: var(--muted);
+    margin-top: .25rem;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--indigo) 0%, var(--rose) 100%);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: .85rem 2.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity .2s, transform .1s;
+    font-family: inherit;
+  }
+  .btn-primary:hover { opacity: .92; transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(.98); }
+
+  .info-box {
+    background: var(--rose-pale);
+    border-left: 4px solid var(--rose);
+    border-radius: 0 10px 10px 0;
+    padding: 1rem 1.2rem;
+    font-size: .85rem;
+    color: var(--text);
+    margin-bottom: 2rem;
+    text-align: left;
+  }
+  .info-box strong { color: var(--rose); }
+
+  /* ── QUIZ SCREEN ── */
+  .category-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--rose-pale);
+    color: var(--rose);
+    border-radius: 99px;
+    padding: .3rem .9rem;
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 1.2rem;
+  }
+
+  .question-card {
+    background: var(--card);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.2rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,.04);
+  }
+  .question-text {
+    font-size: 1.05rem;
+    font-weight: 600;
+    line-height: 1.5;
+    margin-bottom: 1.4rem;
+    color: var(--text);
+  }
+
+  .choices { display: flex; flex-direction: column; gap: .65rem; }
+  .choice-btn {
+    background: #F9F5FB;
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: .85rem 1.1rem;
+    font-size: .9rem;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color .15s, background .15s;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-family: inherit;
+    color: var(--text);
+    line-height: 1.4;
+  }
+  .choice-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--border);
+    color: var(--muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: .78rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    transition: background .15s, color .15s;
+  }
+  .choice-btn:hover:not(:disabled) {
+    border-color: var(--indigo-mid);
+    background: #EEF0FB;
+  }
+  .choice-btn:hover:not(:disabled) .choice-letter {
+    background: var(--indigo-mid);
+    color: white;
+  }
+  .choice-btn.correct {
+    border-color: var(--green);
+    background: var(--green-bg);
+  }
+  .choice-btn.correct .choice-letter {
+    background: var(--green);
+    color: white;
+  }
+  .choice-btn.wrong {
+    border-color: var(--red);
+    background: var(--red-bg);
+  }
+  .choice-btn.wrong .choice-letter {
+    background: var(--red);
+    color: white;
+  }
+  .choice-btn:disabled { cursor: default; }
+
+  .feedback-box {
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    font-size: .88rem;
+    line-height: 1.5;
+    margin-top: 1rem;
+    display: none;
+  }
+  .feedback-box.show { display: block; }
+  .feedback-box.ok { background: var(--green-bg); border-left: 4px solid var(--green); color: #1B5E20; }
+  .feedback-box.ko { background: var(--red-bg); border-left: 4px solid var(--red); color: #7F0000; }
+
+  .next-btn {
+    width: 100%;
+    background: var(--indigo);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: .85rem;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 1rem;
+    transition: background .2s;
+    font-family: inherit;
+    display: none;
+  }
+  .next-btn:hover { background: var(--indigo-mid); }
+  .next-btn.show { display: block; }
+
+  /* ── RESULTS SCREEN ── */
+  #screen-results { text-align: center; padding: 1rem 0; }
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    margin: 0 auto 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 6px solid;
+  }
+  .result-score-big {
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .result-total {
+    font-size: .85rem;
+    font-weight: 500;
+    opacity: .75;
+  }
+  .result-msg {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+  }
+  .result-sub { color: var(--muted); font-size: .9rem; margin-bottom: 2rem; }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .75rem;
+    margin-bottom: 2rem;
+  }
+  .stat-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem .75rem;
+  }
+  .stat-num {
+    font-size: 1.6rem;
+    font-weight: 700;
+    display: block;
+  }
+  .stat-lbl {
+    font-size: .75rem;
+    color: var(--muted);
+    font-weight: 500;
+  }
+
+  .share-section {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  .share-section h3 {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: .4rem;
+    color: var(--indigo);
+  }
+  .share-section p {
+    font-size: .85rem;
+    color: var(--muted);
+    margin-bottom: 1rem;
+  }
+  .share-link-box {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    padding: .75rem 1rem;
+    font-size: .8rem;
+    font-family: monospace;
+    color: var(--indigo);
+    word-break: break-all;
+    margin-bottom: 1rem;
+  }
+  .btn-share {
+    background: #25D366;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: .7rem 1.5rem;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    transition: opacity .2s;
+  }
+  .btn-share:hover { opacity: .88; }
+  .btn-copy {
+    background: var(--indigo);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: .7rem 1.5rem;
+    font-size: .9rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    margin-left: .5rem;
+    transition: opacity .2s;
+  }
+  .btn-copy:hover { opacity: .88; }
+
+  .btn-restart {
+    background: transparent;
+    border: 2px solid var(--rose);
+    color: var(--rose);
+    border-radius: 12px;
+    padding: .8rem 2rem;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .2s, color .2s;
+  }
+  .btn-restart:hover { background: var(--rose); color: white; }
+
+  .kahoot-card {
+    background: linear-gradient(135deg, #46178F 0%, #25D366 100%);
+    color: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: left;
+  }
+  .kahoot-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: .3rem; }
+  .kahoot-card p { font-size: .84rem; opacity: .9; margin-bottom: 1rem; }
+  .platform-btns { display: flex; flex-wrap: wrap; gap: .5rem; }
+  .platform-btn {
+    background: rgba(255,255,255,.2);
+    border: 1.5px solid rgba(255,255,255,.4);
+    color: white;
+    border-radius: 8px;
+    padding: .5rem 1rem;
+    font-size: .82rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: background .2s;
+    font-family: inherit;
+  }
+  .platform-btn:hover { background: rgba(255,255,255,.35); }
+
+  @media(max-width: 480px) {
+    .stats-grid { grid-template-columns: repeat(3,1fr); gap: .5rem; }
+    .module-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">INFAS · 1ère Année Commune</div>
+  <h1>Quiz Gynéco-Obstétrique</h1>
+  <p>Testez vos connaissances sur les bases anatomiques et physiologiques du cours</p>
+</header>
+
+<div class="progress-wrap" id="progressWrap" style="display:none">
+  <span class="progress-label" id="progressLabel">Q 1/20</span>
+  <div class="progress-bar-outer">
+    <div class="progress-bar-inner" id="progressBar" style="width:0%"></div>
+  </div>
+  <span class="score-chip" id="scoreChip">0 pts</span>
+</div>
+
+<main>
+
+<!-- ═══════════ START ═══════════ -->
+<div id="screen-start" class="screen active">
+  <div class="info-box">
+    <strong>📋 Mode d'emploi :</strong> 20 questions à choix unique couvrant tous les chapitres du cours.
+    Chaque bonne réponse vaut <strong>1 point</strong>. Une explication est fournie après chaque réponse.
+  </div>
+
+  <div class="module-grid">
+    <div class="module-chip">🔬 App. génital féminin <span>Anatomie & Physiologie</span></div>
+    <div class="module-chip">🔵 App. génital masculin <span>Anatomie & Physiologie</span></div>
+    <div class="module-chip">🌸 Puberté féminine &amp; masculine <span>Physiologie</span></div>
+    <div class="module-chip">🦴 Bassin obstétrical <span>Anatomie</span></div>
+    <div class="module-chip">🔄 Cycle menstruel <span>Physiologie</span></div>
+    <div class="module-chip">🧬 Gamétogenèse <span>Biologie</span></div>
+    <div class="module-chip">🥚 Fécondation & Développement <span>Embryologie</span></div>
+    <div class="module-chip">🤰 Grossesse <span>Modifications physiologiques</span></div>
+    <div class="module-chip">🏥 Diagnostic & Suivi <span>Consultation prénatale</span></div>
+    <div class="module-chip">👶 Accouchement <span>Mécanisme & Délivrance</span></div>
+  </div>
+
+  <button class="btn-primary" onclick="startQuiz()">🚀 Démarrer le Quiz</button>
+</div>
+
+<!-- ═══════════ QUIZ ═══════════ -->
+<div id="screen-quiz" class="screen">
+  <div class="category-tag" id="categoryTag">📌 Catégorie</div>
+  <div class="question-card">
+    <div class="question-text" id="questionText">Question...</div>
+    <div class="choices" id="choicesContainer"></div>
+    <div class="feedback-box" id="feedbackBox"></div>
+  </div>
+  <button class="next-btn" id="nextBtn" onclick="nextQuestion()">Question suivante →</button>
+</div>
+
+<!-- ═══════════ RESULTS ═══════════ -->
+<div id="screen-results" class="screen">
+  <div class="result-circle" id="resultCircle">
+    <div class="result-score-big" id="resultScore"></div>
+    <div class="result-total" id="resultTotal"></div>
+  </div>
+  <div class="result-msg" id="resultMsg"></div>
+  <div class="result-sub" id="resultSub"></div>
+
+  <div class="stats-grid">
+    <div class="stat-card">
+      <span class="stat-num" id="statCorrect" style="color:var(--green)"></span>
+      <span class="stat-lbl">✅ Correctes</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statWrong" style="color:var(--red)"></span>
+      <span class="stat-lbl">❌ Incorrectes</span>
+    </div>
+    <div class="stat-card">
+      <span class="stat-num" id="statPct" style="color:var(--indigo)"></span>
+      <span class="stat-lbl">📊 Réussite</span>
+    </div>
+  </div>
+
+  <!-- Partage entre amis -->
+  <div class="kahoot-card">
+    <h3>🎮 Réviser en groupe — Plateformes de quiz en ligne</h3>
+    <p>Importez ces questions sur une plateforme gratuite pour jouer avec vos amis en temps réel !</p>
+    <div class="platform-btns">
+      <a class="platform-btn" href="https://kahoot.com" target="_blank">🎯 Kahoot!</a>
+      <a class="platform-btn" href="https://quizlet.com" target="_blank">📚 Quizlet</a>
+      <a class="platform-btn" href="https://quizizz.com" target="_blank">⚡ Quizizz</a>
+      <a class="platform-btn" href="https://wordwall.net" target="_blank">🎲 Wordwall</a>
+      <a class="platform-btn" href="https://mentimeter.com" target="_blank">📊 Mentimeter</a>
+    </div>
+  </div>
+
+  <div class="share-section">
+    <h3>📤 Partager ce quiz</h3>
+    <p>Copiez ce lien et envoyez-le à vos camarades sur WhatsApp ou Telegram :</p>
+    <div class="share-link-box" id="shareLink">Chargement du lien...</div>
+    <button class="btn-share" onclick="shareWhatsApp()">💬 Partager sur WhatsApp</button>
+    <button class="btn-copy" onclick="copyLink()">📋 Copier le lien</button>
+  </div>
+
+  <button class="btn-restart" onclick="restartQuiz()">🔁 Recommencer le Quiz</button>
+</div>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  {
+    cat: "🔬 App. génital féminin",
+    q: "Combien d'éléments constitutifs comprend la vulve ?",
+    opts: ["4 éléments", "5 éléments", "6 éléments", "8 éléments"],
+    ans: 2,
+    exp: "La vulve comprend 6 éléments : le mont de Vénus, les formations labiales, le vestibule, les organes érectiles, les glandes vulvaires et l'hymen."
+  },
+  {
+    cat: "🔬 App. génital féminin",
+    q: "Quelle est la longueur moyenne du vagin ?",
+    opts: ["4 cm", "6 cm", "8 cm", "12 cm"],
+    ans: 2,
+    exp: "La longueur moyenne du vagin est de 8 cm. Un vagin court mesure moins de 4 cm et un vagin long dépasse 14 cm."
+  },
+  {
+    cat: "🔬 App. génital féminin",
+    q: "Quelle tunique de l'utérus joue un rôle majeur dans l'accouchement ?",
+    opts: ["La séreuse (péritoine)", "Le myomètre (musculeuse)", "L'endomètre (muqueuse)", "Le ligament large"],
+    ans: 1,
+    exp: "Le myomètre (musculeuse) est la tunique musculaire de l'utérus qui génère les contractions nécessaires à l'expulsion du fœtus lors de l'accouchement."
+  },
+  {
+    cat: "🔬 App. génital féminin",
+    q: "Quelle est la fonction triple des trompes de Fallope dans la reproduction ?",
+    opts: ["Production hormonale, ovulation, nidation", "Captation de l'ovule, transit, nutrition de l'œuf", "Fécondation, transport, implantation", "Sécrétion, captation, implantation"],
+    ans: 1,
+    exp: "Les trompes de Fallope ont une triple fonction : la captation de l'ovule, le transit des spermatozoïdes/ovule/œuf, et la nutrition de l'œuf."
+  },
+  {
+    cat: "🔵 App. génital masculin",
+    q: "Quelle est la taille normale d'un pénis au repos ?",
+    opts: ["3 à 5 cm", "5 à 7 cm", "7 à 11 cm", "10 à 15 cm"],
+    ans: 2,
+    exp: "Au repos, la taille normale d'un pénis mesure entre 7 et 11 cm. En érection, la taille normale est entre 10 et 18 cm."
+  },
+  {
+    cat: "🔵 App. génital masculin",
+    q: "Quelle est la double fonction des testicules ?",
+    opts: ["Transport du sperme et sécrétion de glaire", "Production de spermatozoïdes et sécrétion hormonale", "Érection et éjaculation", "Production d'urine et de testostérone"],
+    ans: 1,
+    exp: "Les testicules ont une fonction excrétrice (production de spermatozoïdes) et une fonction endocrine (production d'androgènes, dont la testostérone)."
+  },
+  {
+    cat: "🌸 Puberté féminine",
+    q: "À quel âge apparaissent en moyenne les premières règles (ménarches) chez la fille ?",
+    opts: ["10 ans", "11 ans", "13 ans", "15 ans"],
+    ans: 2,
+    exp: "Les premières règles apparaissent en moyenne à 13 ans, avec des extrêmes allant de 9 à 14 ans (95% des filles)."
+  },
+  {
+    cat: "🌸 Puberté féminine",
+    q: "Quelle est la définition de la puberté précoce chez la fille ?",
+    opts: ["Signes pubertaires avant 10 ans", "Signes pubertaires avant 8 ans", "Absence de règles à 15 ans", "Signes pubertaires avant 12 ans"],
+    ans: 1,
+    exp: "La puberté précoce chez la fille est définie par l'apparition des caractères sexuels secondaires (seins, pilosité, menstruation) avant l'âge de 8 ans."
+  },
+  {
+    cat: "🌸 Puberté masculine",
+    q: "Quel est le premier signe pubertaire chez le garçon ?",
+    opts: ["L'apparition de la moustache", "La mutation de la voix", "L'augmentation du volume testiculaire", "La pilosité pubienne"],
+    ans: 2,
+    exp: "Le premier signe de puberté chez le garçon est l'augmentation du volume testiculaire, qui survient vers l'âge de 11,5 ans."
+  },
+  {
+    cat: "🦴 Bassin obstétrical",
+    q: "Quel plan du bassin osseux est appelé 'plan d'engagement de la présentation' ?",
+    opts: ["Le détroit inférieur", "L'excavation pelvienne", "Le détroit supérieur", "Le détroit moyen"],
+    ans: 2,
+    exp: "Le détroit supérieur est le plan d'engagement de la présentation fœtale. Il sépare le petit bassin (pelvis mineur) du grand bassin."
+  },
+  {
+    cat: "🦴 Bassin obstétrical",
+    q: "Par quoi est délimité le détroit moyen ?",
+    opts: ["Le promontoire et la symphyse pubienne", "Les épines sciatiques", "Les tubérosités ischiatiques", "Le coccyx et les ligaments sacro-sciatiques"],
+    ans: 1,
+    exp: "Le détroit moyen est un léger rétrécissement de l'excavation pelvienne qui passe par les épines sciatiques."
+  },
+  {
+    cat: "🔄 Cycle menstruel",
+    q: "Quelle est la durée moyenne du cycle menstruel ?",
+    opts: ["21 jours", "25 jours", "28 jours", "35 jours"],
+    ans: 2,
+    exp: "Le cycle menstruel dure en moyenne 28 jours pour environ 60% des femmes. Un cycle court est < 25 jours, un cycle long > 35 jours."
+  },
+  {
+    cat: "🔄 Cycle menstruel",
+    q: "À quel jour du cycle survient l'ovulation dans un cycle régulier de 28 jours ?",
+    opts: ["J10", "J12", "J14", "J16"],
+    ans: 2,
+    exp: "L'ovulation survient au 14ème jour du cycle. Elle est caractérisée par la rupture du follicule mûr (follicule de De Graaf) et l'expulsion de l'ovocyte."
+  },
+  {
+    cat: "🔄 Cycle menstruel",
+    q: "Quelle structure est responsable de la sécrétion de progestérone après l'ovulation ?",
+    opts: ["Le follicule primordial", "L'endomètre", "Le corps jaune", "L'hypothalamus"],
+    ans: 2,
+    exp: "Après la rupture folliculaire, le follicule de De Graaf se transforme en corps jaune, qui sécrète la progestérone et maintient la phase lutéale du cycle."
+  },
+  {
+    cat: "🔄 Cycle menstruel",
+    q: "Quels 4 éléments interviennent dans la régulation du cycle menstruel ?",
+    opts: ["Thyroïde, hypophyse, ovaires, endomètre", "Hypothalamus, hypophyse, ovaires, endomètre", "Hypothalamus, surrénales, ovaires, vagin", "Cerveau, thyroïde, ovaires, utérus"],
+    ans: 1,
+    exp: "Quatre éléments interviennent dans le cycle menstruel : l'hypothalamus et l'hypophyse (niveau central) + les ovaires et l'endomètre (niveau gynécologique)."
+  },
+  {
+    cat: "🧬 Gamétogenèse & Fécondation",
+    q: "Où se produit habituellement la fécondation ?",
+    opts: ["Dans l'utérus", "Dans le col de l'utérus", "Dans le tiers externe de la trompe de Fallope", "Dans l'ovaire"],
+    ans: 2,
+    exp: "La fécondation se produit habituellement dans le tiers externe (ampoule) de la trompe de Fallope, peu après l'ovulation."
+  },
+  {
+    cat: "🤰 Grossesse",
+    q: "Comment appelle-t-on les saignements physiologiques qui accompagnent l'involution utérine après l'accouchement ?",
+    opts: ["Les métrorragies", "Les lochies", "Les règles de retour", "Le sang de délivrance"],
+    ans: 1,
+    exp: "Les lochies sont les saignements physiologiques qui accompagnent l'involution utérine après l'accouchement, lors des suites de couches."
+  },
+  {
+    cat: "🏥 Diagnostic & Suivi",
+    q: "Que signifie le sigle S.O.N.U. en obstétrique ?",
+    opts: ["Soins Obstétricaux Normaux d'Urgence", "Soins Obstétricaux et Néonataux d'Urgence", "Service Obstétrical et Néonatal Universitaire", "Surveillance Obstétricale Néonatale Unifiée"],
+    ans: 1,
+    exp: "S.O.N.U. signifie Soins Obstétricaux et Néonataux d'Urgence. Ce sont les interventions essentielles pour réduire la mortalité maternelle et néonatale."
+  },
+  {
+    cat: "👶 Accouchement",
+    q: "Quel muscle de l'utérus est le principal 'moteur de l'accouchement' ?",
+    opts: ["L'endomètre", "La séreuse", "Le myomètre", "Le ligament large"],
+    ans: 2,
+    exp: "Le myomètre (muscle lisse de l'utérus) est le moteur de l'accouchement : ses contractions propulsent le fœtus à travers le canal obstétrical."
+  },
+  {
+    cat: "👶 Accouchement",
+    q: "Quelle est la définition de la délivrance ?",
+    opts: ["L'expulsion du fœtus hors de l'utérus", "L'expulsion du placenta et des membranes après l'accouchement", "La section du cordon ombilical", "Le retour des contractions après l'accouchement"],
+    ans: 1,
+    exp: "La délivrance est la 3ème période de l'accouchement, correspondant à l'expulsion du placenta (délivre) et des membranes hors de l'utérus, après la naissance du bébé."
+  }
+];
+
+let current = 0;
+let score = 0;
+let shuffled = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startQuiz() {
+  shuffled = shuffle(QUESTIONS);
+  current = 0;
+  score = 0;
+  showScreen('screen-quiz');
+  document.getElementById('progressWrap').style.display = 'flex';
+  renderQuestion();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function renderQuestion() {
+  const q = shuffled[current];
+  const total = shuffled.length;
+
+  // Progress
+  document.getElementById('progressLabel').textContent = `Q ${current + 1}/${total}`;
+  document.getElementById('progressBar').style.width = ((current / total) * 100) + '%';
+  document.getElementById('scoreChip').textContent = score + ' pts';
+
+  // Category
+  document.getElementById('categoryTag').textContent = q.cat;
+
+  // Question
+  document.getElementById('questionText').textContent = q.q;
+
+  // Choices
+  const cont = document.getElementById('choicesContainer');
+  cont.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span class="choice-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAnswer(i);
+    cont.appendChild(btn);
+  });
+
+  // Reset feedback
+  const fb = document.getElementById('feedbackBox');
+  fb.className = 'feedback-box';
+  fb.textContent = '';
+
+  // Hide next
+  document.getElementById('nextBtn').classList.remove('show');
+}
+
+function selectAnswer(idx) {
+  const q = shuffled[current];
+  const btns = document.querySelectorAll('.choice-btn');
+  btns.forEach(b => b.disabled = true);
+
+  const fb = document.getElementById('feedbackBox');
+
+  if (idx === q.ans) {
+    btns[idx].classList.add('correct');
+    fb.className = 'feedback-box ok show';
+    fb.innerHTML = `✅ <strong>Bonne réponse !</strong> ${q.exp}`;
+    score++;
+  } else {
+    btns[idx].classList.add('wrong');
+    btns[q.ans].classList.add('correct');
+    fb.className = 'feedback-box ko show';
+    fb.innerHTML = `❌ <strong>Incorrect.</strong> La bonne réponse était : <em>${q.opts[q.ans]}</em>. ${q.exp}`;
+  }
+
+  document.getElementById('scoreChip').textContent = score + ' pts';
+
+  const nextBtn = document.getElementById('nextBtn');
+  nextBtn.textContent = current + 1 < shuffled.length ? 'Question suivante →' : '📊 Voir mes résultats';
+  nextBtn.classList.add('show');
+}
+
+function nextQuestion() {
+  current++;
+  if (current < shuffled.length) {
+    renderQuestion();
+  } else {
+    showResults();
+  }
+}
+
+function showResults() {
+  showScreen('screen-results');
+  document.getElementById('progressWrap').style.display = 'none';
+
+  const total = shuffled.length;
+  const pct = Math.round((score / total) * 100);
+  const wrong = total - score;
+
+  document.getElementById('resultScore').textContent = score;
+  document.getElementById('resultTotal').textContent = '/ ' + total;
+  document.getElementById('statCorrect').textContent = score;
+  document.getElementById('statWrong').textContent = wrong;
+  document.getElementById('statPct').textContent = pct + '%';
+
+  const circle = document.getElementById('resultCircle');
+  let msg, sub, color;
+
+  if (pct >= 80) {
+    msg = '🏆 Excellent travail !'; sub = 'Vous maîtrisez très bien le cours de gynéco-obstétrique.';
+    color = 'var(--green)'; circle.style.borderColor = 'var(--green)'; circle.style.color = 'var(--green)';
+  } else if (pct >= 60) {
+    msg = '👍 Bon résultat !'; sub = 'Quelques révisions sur les points manqués et vous serez au top !';
+    color = 'var(--gold)'; circle.style.borderColor = 'var(--gold)'; circle.style.color = 'var(--gold)';
+  } else {
+    msg = '💪 Courage, continuez !'; sub = 'Reprenez les chapitres manqués et retentez le quiz.';
+    color = 'var(--rose)'; circle.style.borderColor = 'var(--rose)'; circle.style.color = 'var(--rose)';
+  }
+
+  document.getElementById('resultMsg').textContent = msg;
+  document.getElementById('resultSub').textContent = sub;
+
+  // Share link (lien vers ce fichier ou page hébergée)
+  const shareText = `Quiz Gynéco-Obstétrique INFAS – J'ai obtenu ${score}/${total} (${pct}%). Testez-vous aussi ! 🏥`;
+  document.getElementById('shareLink').textContent = shareText;
+}
+
+function shareWhatsApp() {
+  const score_ = document.getElementById('resultScore').textContent;
+  const total_ = shuffled.length;
+  const pct_ = Math.round((parseInt(score_) / total_) * 100);
+  const text = encodeURIComponent(`🏥 Quiz Gynéco-Obstétrique INFAS\nJ'ai obtenu ${score_}/${total_} (${pct_}%) !\n\nTestez vos connaissances vous aussi en révisions avec ce quiz 📚\n#INFAS #GynécoObstétrique`);
+  window.open(`https://wa.me/?text=${text}`, '_blank');
+}
+
+function copyLink() {
+  const txt = document.getElementById('shareLink').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.querySelector('.btn-copy');
+    btn.textContent = '✅ Copié !';
+    setTimeout(() => btn.textContent = '📋 Copier le lien', 2000);
+  });
+}
+
+function restartQuiz() {
+  document.getElementById('progressWrap').style.display = 'none';
+  showScreen('screen-start');
+}
+</script>
+</body>
+</html>
